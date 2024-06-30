@@ -1,10 +1,52 @@
+"use strict";
+
 import Account from "@/components/modules/profile/account/Account";
 import Security from "@/components/modules/profile/security/Security";
 import { Separator } from "@/components/ui/separator";
-import { useState } from "react";
+import { Info as User } from "@/core/models/User";
+import { AuthServices } from "@/core/services/AuthServices";
+import { UserServices } from "@/core/services/UserServices";
+import { useEffect, useState } from "react";
 
 export default function Profile() {
+  const [user, setUser] = useState<User | undefined>(undefined);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("account");
+
+  const authServices = AuthServices();
+  const userServices = UserServices();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      window.location.href = "/";
+    }
+
+    const data = authServices.parseJwt(token as string);
+
+    if (data) {
+      userServices.fetchUserByAuthId(data.nameid).then(
+        (user) => {
+          setUser(user);
+          setLoading(false);
+        },
+        (error) => {
+          const statusCode = error.response?.status;
+
+          if (statusCode === 404) {
+            window.location.href = "/home";
+          } else {
+            window.location.href = "/";
+          }
+
+          setLoading(false);
+        }
+      );
+    } else {
+      window.location.href = "/";
+    }
+  }, []);
 
   return (
     <div className="w-full mt-8">
@@ -41,7 +83,15 @@ export default function Profile() {
             <h2 className="text-2xl font-bold text-gray-700">Account</h2>
 
             <div className="w-full h-full mt-5">
-              <Account />
+              {loading ? (
+                <div className="w-full h-full flex items-center justify-center">
+                  <p className="text-lg font-medium text-gray-700">
+                    Loading...
+                  </p>
+                </div>
+              ) : (
+                <Account user={user} />
+              )}
             </div>
           </div>
 

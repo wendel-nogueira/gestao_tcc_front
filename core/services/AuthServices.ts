@@ -1,5 +1,6 @@
 import { useApi } from "../hooks/useApi";
 import { User } from "../models/User";
+import jwt_decode from "jwt-decode";
 
 const url = "http://localhost:5257";
 
@@ -101,6 +102,19 @@ export function AuthServices() {
     return response.data;
   };
 
+  const getToken = () => {
+    return localStorage.getItem("token");
+  };
+
+  const parseJwt = (token: string) => {
+    if (!token) {
+      return;
+    }
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace("-", "+").replace("_", "/");
+    return JSON.parse(window.atob(base64));
+  };
+
   return {
     fetchUsers,
     fetchUser,
@@ -112,5 +126,7 @@ export function AuthServices() {
     requestPasswordReset,
     resetPassword,
     changeEmail,
+    getToken,
+    parseJwt,
   };
 }

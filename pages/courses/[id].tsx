@@ -1,4 +1,6 @@
-import { useState } from "react";
+"use strict";
+
+import { useEffect, useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import FormCourse from "@/components/modules/course/form/Form";
 import ListEdict from "@/components/modules/edict/list/List";
@@ -6,9 +8,22 @@ import ListStudents from "@/components/modules/students/list/List";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@phosphor-icons/react";
 import Link from "next/link";
+import { Course } from "@/core/models/Course";
 
 export default function Edit() {
+  const [id, setId] = useState<string | undefined>(undefined);
+  const [course, setCourse] = useState<Course | undefined>(undefined);
   const [activeTab, setActiveTab] = useState("edict");
+
+  useEffect(() => {
+    const id = window.location.pathname.split("/").pop();
+
+    if (id) {
+      setId(id);
+    } else {
+      window.location.href = "/home";
+    }
+  }, []);
 
   return (
     <div className="w-full mt-8">
@@ -51,11 +66,13 @@ export default function Edit() {
           <div className={"w-full" + (activeTab === "edict" ? "" : " hidden")}>
             <div className="w-full flex items-center justify-between">
               <h2 className="text-2xl font-bold text-gray-700">Edicts</h2>
-              <Link href="/edicts/create">
-                <Button variant="outline">
-                  <Calendar className="mr-2" size={16} /> Add Edict
-                </Button>
-              </Link>
+              {id && (
+                <Link href={`/edicts/create?courseId=${id}`}>
+                  <Button variant="outline">
+                    <Calendar className="mr-2" size={16} /> Add Edict
+                  </Button>
+                </Link>
+              )}
             </div>
 
             <div className="w-full h-full mt-5">
