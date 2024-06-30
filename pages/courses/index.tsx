@@ -13,10 +13,59 @@ import { CaretSortIcon, DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { CourseServices } from "@/core/services/CourseServices";
+import api from "axios";
 
 export default function Courses() {
   const [loading, setLoading] = useState(false);
   const [courses, setCourses] = useState([] as Course[]);
+  const courseServices = CourseServices();
+  const [teachers, setTeachers] = useState([]);
+  const url = "https://285d2cd5de532ee05558003c9c675417.loophole.site";
+
+  useEffect(() => {
+    async function fetchTeachers() {
+      try {
+        const response = await api.get(`${url}/api/users`);
+        const filteredTeachers = response.data.filter((user: any) => user.role === "Teacher");
+        console.log(filteredTeachers);
+        setTeachers(filteredTeachers);
+      } catch (error) {
+        console.error("Failed to fetch teachers", error);
+      }
+    }
+
+    fetchTeachers();
+  }, []);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      const courses = await courseServices.fetchCourses().catch((error) => {
+        console.error(error);
+        return [];
+      });
+
+      if (!courses || courses.length === 0) return;
+
+      const allCourses = courses.map((course) => {
+        const coordinator = teachers.find((teacher: any) => teacher.id === course.coordinator) as any;
+        const tccCoordinator = teachers.find((teacher: any) => teacher.id === course.tccCoordinator) as any;
+
+        return {
+          id: course.id!,
+          name: course.name!,
+          acronym: course.acronym!,
+          coordinator: coordinator ? coordinator.name : "Unknown",
+          tccCoordinator: tccCoordinator ? tccCoordinator.name : "Unknown",
+        };
+      });
+
+      setCourses(allCourses);
+      setLoading(false);
+    };
+
+    fetchCourses();
+  }, [courseServices]);
 
   return (
     <div className="p-6 space-y-6 mt-10">

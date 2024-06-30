@@ -1,5 +1,12 @@
 "use strict";
 
+<<<<<<< HEAD
+=======
+import { Course } from "@/core/models/Course";
+import { useState, useEffect } from "react";
+import api from "axios";
+import { useApi } from "../../../../core/hooks/useApi";
+>>>>>>> jhonatas
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -30,8 +37,33 @@ import {
   SelectContent,
   SelectGroup,
 } from "@/components/ui/select";
+<<<<<<< HEAD
 
 export default function FormCourse() {
+=======
+import { CourseServices } from "@/core/services/CourseServices";
+
+export default function FormCourse() {
+  const courseServices = CourseServices();
+  const [teachers, setTeachers] = useState([]);
+  const url = "https://285d2cd5de532ee05558003c9c675417.loophole.site";
+
+  useEffect(() => {
+    async function fetchTeachers() {
+      try {
+        const response = await api.get(`${url}/api/users`);
+        const filteredTeachers = response.data.filter((user: any) => user.role === "Teacher");
+        console.log(filteredTeachers);
+        setTeachers(filteredTeachers);
+      } catch (error) {
+        console.error("Failed to fetch teachers", error);
+      }
+    }
+
+    fetchTeachers();
+  }, []);
+
+>>>>>>> jhonatas
   const formSchema = z.object({
     name: z.string().nonempty("Name is required"),
     acronym: z.string().nonempty("Acronym is required"),
@@ -45,6 +77,25 @@ export default function FormCourse() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     const { name, acronym, coordinator, tccCoordinator } = values;
+<<<<<<< HEAD
+=======
+
+    const course: Course = {
+      name,
+      acronym,
+      coordinator,
+      tccCoordinator,
+    };
+
+    courseServices
+      .createCourse(course)
+      .then(() => {
+        alert("Course created successfully, plase verify your email");
+      })
+      .catch((error) => {
+        alert("An error occurred");
+      });
+>>>>>>> jhonatas
   }
 
   return (
@@ -104,6 +155,14 @@ export default function FormCourse() {
                       <SelectContent>
                         <SelectGroup>
                           <SelectLabel>Coordinators</SelectLabel>
+<<<<<<< HEAD
+=======
+                          {teachers.map((teacher: any) => (
+                            <SelectItem key={teacher.id} value={teacher.id}>
+                              {teacher.name}
+                            </SelectItem>
+                          ))}
+>>>>>>> jhonatas
                         </SelectGroup>
                       </SelectContent>
                     </Select>
@@ -132,6 +191,14 @@ export default function FormCourse() {
                       <SelectContent>
                         <SelectGroup>
                           <SelectLabel>Coordinators</SelectLabel>
+<<<<<<< HEAD
+=======
+                          {teachers.map((teacher: any) => (
+                            <SelectItem key={teacher.id} value={teacher.id}>
+                              {teacher.name}
+                            </SelectItem>
+                          ))}
+>>>>>>> jhonatas
                         </SelectGroup>
                       </SelectContent>
                     </Select>

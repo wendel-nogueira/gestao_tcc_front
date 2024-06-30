@@ -47,12 +47,7 @@ export default function Create() {
           <div
             className={"w-full" + (activeTab === "schedule" ? "" : " hidden")}
           >
-            <div className="w-full flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-700">Schedule</h2>
-              <Button variant="outline">
-                <Calendar className="mr-2" size={16} /> Add Schedule
-              </Button>
-            </div>
+            <h2 className="text-2xl font-bold text-gray-700">Schedule</h2>
 
             <div className="w-full h-full mt-5">
               <ListSchedule />

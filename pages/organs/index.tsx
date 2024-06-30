@@ -13,10 +13,55 @@ import { CaretSortIcon, DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { OrganServices } from "@/core/services/OrganServices";
+import api from "axios";
 
 export default function Organs() {
   const [loading, setLoading] = useState(false);
   const [organs, setOrgans] = useState([] as Organ[]);
+  const organServices = OrganServices();
+  const [courses, setCourses] = useState([]);
+  const url = "https://285d2cd5de532ee05558003c9c675417.loophole.site";
+
+  useEffect(() => {
+    async function fetchCourses() {
+      try {
+        const response = await api.get(`${url}/api/course`);
+        setCourses(response.data);
+      } catch (error) {
+        console.error("Failed to fetch courses", error);
+      }
+    }
+
+    fetchCourses();
+  }, []);
+
+  useEffect(() => {
+    const fetchOrgans = async () => {
+      const organs = await organServices.fetchOrgans().catch((error) => {
+        console.error(error);
+        return [];
+      });
+
+      if (!organs || organs.length === 0) return;
+
+      const allOrgans = organs.map((organ) => {
+        const course = courses.find((course: any) => course.id === organ.courseId) as any;
+
+        return {
+          id: organ.id!,
+          name: organ.name!,
+          acronym: organ.acronym!,
+          course: course ? course.name : "Unknown",
+        } as any;
+      });
+
+      setOrgans(allOrgans);
+      setLoading(false);
+    };
+
+    fetchOrgans();
+  }, [organServices]);
 
   return (
     <div className="p-6 space-y-6 mt-10">
