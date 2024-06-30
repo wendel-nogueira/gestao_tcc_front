@@ -22,11 +22,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { AuthServices } from "@/core/services/AuthServices";
-<<<<<<< HEAD
 import { Info as User } from "@/core/models/User";
-=======
-import { User } from "@/core/models/User";
->>>>>>> jhonatas
 import {
   Popover,
   PopoverContent,
@@ -45,7 +41,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-<<<<<<< HEAD
 import { useEffect, useState } from "react";
 import { UserServices } from "@/core/services/UserServices";
 
@@ -134,32 +129,6 @@ export default function Account(props: AccountProps) {
   });
 
   function completeFields() {
-=======
-import { Separator } from "@radix-ui/react-select";
-import { useEffect } from "react";
-
-export default function Account() {
-  let userType: string = "external";
-
-  const formSchema = z.object({
-    name: z.string().nonempty("Name is required"),
-    cpf: z.string().nonempty("CPF is required"),
-    birthDate: z.date().refine((date) => {
-      return date < new Date() && date > new Date("1900-01-01");
-    }, "Invalid date"),
-    sex: z.enum(["Male", "Female", "Non-binary", "Other", "Not-to-say"]),
-    registration: z.string().optional(),
-    course: z.string().optional(),
-    admissionDate: z.date().optional(),
-    graduationDate: z.date().optional(),
-    siape: z.string().optional(),
-    area: z.string().optional(),
-    institution: z.string().optional(),
-    formation: z.string().optional(),
-  });
-
-  useEffect(() => {
->>>>>>> jhonatas
     if (userType === "student") {
       formSchema.extend({
         registration: z.string().nonempty("Registration is required"),
@@ -179,7 +148,6 @@ export default function Account() {
         area: z.string().nonempty("Area is required"),
       });
     }
-<<<<<<< HEAD
   }
 
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -249,18 +217,6 @@ export default function Account() {
         window.alert("User updated successfully");
       });
     }
-=======
-  }, []);
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-  });
-
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    const { name, cpf, birthDate, sex } = values;
-
-    console.log();
->>>>>>> jhonatas
   }
 
   return (
@@ -268,7 +224,6 @@ export default function Account() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
         <Card>
           <CardHeader>
-<<<<<<< HEAD
             <CardTitle>
               {toAdd
                 ? "Complete Information"
@@ -283,10 +238,6 @@ export default function Account() {
                 ? "Update your information"
                 : "Create your account"}
             </CardDescription>
-=======
-            <CardTitle>Update Information</CardTitle>
-            <CardDescription>Update your account information</CardDescription>
->>>>>>> jhonatas
           </CardHeader>
           <CardContent className="w-full grid grid-cols-2 gap-2">
             <FormField

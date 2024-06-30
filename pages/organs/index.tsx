@@ -15,53 +15,63 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { OrganServices } from "@/core/services/OrganServices";
 import api from "axios";
+import { CourseServices } from "@/core/services/CourseServices";
+import { Course } from "@/core/models/Course";
 
 export default function Organs() {
   const [loading, setLoading] = useState(false);
-  const [organs, setOrgans] = useState([] as Organ[]);
+  const [organs, setOrgans] = useState<Organ[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
+
   const organServices = OrganServices();
-  const [courses, setCourses] = useState([]);
-  const url = "https://285d2cd5de532ee05558003c9c675417.loophole.site";
+  const courseServices = CourseServices();
 
   useEffect(() => {
-    async function fetchCourses() {
-      try {
-        const response = await api.get(`${url}/api/course`);
-        setCourses(response.data);
-      } catch (error) {
-        console.error("Failed to fetch courses", error);
-      }
-    }
+    setLoading(true);
 
-    fetchCourses();
+    courseServices
+      .fetchCourses()
+      .then((courses) => {
+        setCourses(courses);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Failed to fetch courses", error);
+        setLoading(false);
+      });
   }, []);
 
   useEffect(() => {
-    const fetchOrgans = async () => {
-      const organs = await organServices.fetchOrgans().catch((error) => {
-        console.error(error);
-        return [];
+    if (courses.length === 0) return;
+
+    setLoading(true);
+
+    organServices
+      .fetchOrgans()
+      .then((organs) => {
+        const allOrgans = organs.map((organ) => {
+          console.log(organ);
+          console.log(courses);
+          const course = courses.find(
+            (course: any) => course.id === organ.courseId
+          ) as any;
+
+          return {
+            id: organ.id!,
+            name: organ.name!,
+            acronym: organ.acronym!,
+            course: course ? course.name : "No course",
+          } as any;
+        });
+
+        setOrgans(allOrgans);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Failed to fetch organs", error);
+        setLoading(false);
       });
-
-      if (!organs || organs.length === 0) return;
-
-      const allOrgans = organs.map((organ) => {
-        const course = courses.find((course: any) => course.id === organ.courseId) as any;
-
-        return {
-          id: organ.id!,
-          name: organ.name!,
-          acronym: organ.acronym!,
-          course: course ? course.name : "Unknown",
-        } as any;
-      });
-
-      setOrgans(allOrgans);
-      setLoading(false);
-    };
-
-    fetchOrgans();
-  }, [organServices]);
+  }, [courses]);
 
   return (
     <div className="p-6 space-y-6 mt-10">
@@ -140,7 +150,9 @@ export const columns: ColumnDef<any>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("course")}</div>,
+    cell: ({ row }) => (
+      <div className="lowercase">{row.getValue("course")}</div>
+    ),
   },
   {
     id: "actions",

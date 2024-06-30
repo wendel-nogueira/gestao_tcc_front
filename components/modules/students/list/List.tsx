@@ -29,7 +29,6 @@ export default function ListStudents() {
 
       if (!users || users.length === 0) return;
 
-<<<<<<< HEAD
       const allUsers = users
         .filter((user) => (user.role as any).name! === "Student")
         .map((user) => {
@@ -39,15 +38,6 @@ export default function ListStudents() {
             role: (user.role as any).name!,
           };
         });
-=======
-      const allUsers = users.map((user) => {
-        return {
-          id: user.id!,
-          email: user.email!,
-          role: (user.role as any).name!,
-        };
-      });
->>>>>>> jhonatas
 
       setUsers(allUsers);
       setLoading(false);
@@ -137,11 +127,7 @@ export const columns: ColumnDef<any>[] = [
           <DropdownMenuContent align="end" className="z-10 bg-white p-2">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem>
-<<<<<<< HEAD
               <Link href={`/users/${user.id}`}>View profile</Link>
-=======
-              <Link href={`/edicts/${user.id}`}>View edict</Link>
->>>>>>> jhonatas
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
