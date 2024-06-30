@@ -1,5 +1,6 @@
 "use strict";
 
+import { Organ } from "@/core/models/Organ";
 import { useState, useEffect } from "react";
 import api from "axios";
 import { useApi } from "../../../../core/hooks/useApi";
@@ -34,8 +35,10 @@ import {
   SelectGroup,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { OrganServices } from "@/core/services/OrganServices";
 
 export default function FormOrgan() {
+  const organServices = OrganServices();
   const [courses, setCourses] = useState([]);
   const url = "https://5cd4e4d3fa8bcbbb21cbbcfb21ced38e.loophole.site";
 
@@ -65,6 +68,22 @@ export default function FormOrgan() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     const { name, acronym, description, course } = values;
+
+    const organ: Organ = {
+      name,
+      acronym,
+      description,
+      course,
+    };
+
+    organServices
+      .createOrgan(organ)
+      .then(() => {
+        alert("Organ created successfully, plase verify your email");
+      })
+      .catch((error) => {
+        alert("An error occurred");
+      });
   }
 
   return (

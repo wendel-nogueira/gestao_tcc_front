@@ -1,6 +1,6 @@
 "use strict";
 
-import { Course } from "../models/Course";
+import { Course } from "@/core/models/Course";
 import { useState, useEffect } from "react";
 import api from "axios";
 import { useApi } from "../../../../core/hooks/useApi";
@@ -34,10 +34,10 @@ import {
   SelectContent,
   SelectGroup,
 } from "@/components/ui/select";
-import { CouseServices } from "@/core/services/CourseServices";
+import { CourseServices } from "@/core/services/CourseServices";
 
 export default function FormCourse() {
-  const courseServices = CouseServices();
+  const courseServices = CourseServices();
   const [teachers, setTeachers] = useState([]);
   const url = "https://285d2cd5de532ee05558003c9c675417.loophole.site";
 

@@ -17,17 +17,17 @@ export function OrganServices() {
   };
 
   const createOrgan = async (organ: Organ) => {
-    const response = await api.post<Organ>(`${url}/api/crgan`, organ);
+    const response = await api.post<Organ>(`${url}/api/organ`, organ);
     return response.data;
   };
 
   const updateOrgan = async (organ: Organ) => {
-    const response = await api.put<Organ>(`${url}/api/crgan/${organ.id}`, organ);
+    const response = await api.put<Organ>(`${url}/api/organ/${organ.id}`, organ);
     return response.data;
   };
 
   const removeOrgan = async (organ: Organ) => {
-    const response = await api.delete<Organ>(`${url}/api/crgan/${organ.id}`);
+    const response = await api.delete<Organ>(`${url}/api/organ/${organ.id}`);
     return response.data;
   };
 

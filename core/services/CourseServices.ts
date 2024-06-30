@@ -4,11 +4,11 @@ import { Edict } from "../models/Edict";
 
 const url = "https://5cd4e4d3fa8bcbbb21cbbcfb21ced38e.loophole.site";
 
-export function CouseServices() {
+export function CourseServices() {
   const api = useApi();
 
   const fetchCourses = async () => {
-    const response = await api.get<Course[]>(`${url}${url}/api/course`);
+    const response = await api.get<Course[]>(`${url}/api/course`);
     return response.data;
   };
 
