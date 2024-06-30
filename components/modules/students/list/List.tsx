@@ -29,13 +29,15 @@ export default function ListStudents() {
 
       if (!users || users.length === 0) return;
 
-      const allUsers = users.map((user) => {
-        return {
-          id: user.id!,
-          email: user.email!,
-          role: (user.role as any).name!,
-        };
-      });
+      const allUsers = users
+        .filter((user) => (user.role as any).name! === "Student")
+        .map((user) => {
+          return {
+            id: user.id!,
+            email: user.email!,
+            role: (user.role as any).name!,
+          };
+        });
 
       setUsers(allUsers);
       setLoading(false);
@@ -125,7 +127,7 @@ export const columns: ColumnDef<any>[] = [
           <DropdownMenuContent align="end" className="z-10 bg-white p-2">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem>
-              <Link href={`/edicts/${user.id}`}>View edict</Link>
+              <Link href={`/users/${user.id}`}>View profile</Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/select";
 
 export default function FormWork() {
-  const formSchema = z.object({
+  const formSchema: any = z.object({
     name: z.string().nonempty("Name is required"),
     acronym: z.string().nonempty("Acronym is required"),
     coordinator: z.string().nonempty("Coordinator is required"),

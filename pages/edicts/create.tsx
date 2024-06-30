@@ -1,10 +1,12 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { User as UserIcon } from "@phosphor-icons/react";
+import { Calendar, User as UserIcon } from "@phosphor-icons/react";
 import { Separator } from "@/components/ui/separator";
 import FormEdict from "@/components/modules/edict/form/Form";
 import ListWorks from "@/components/modules/work/list/List";
 import ListSchedule from "@/components/modules/schedule/list/List";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function Create() {
   const [activeTab, setActiveTab] = useState("info");
@@ -45,7 +47,12 @@ export default function Create() {
           <div
             className={"w-full" + (activeTab === "schedule" ? "" : " hidden")}
           >
-            <h2 className="text-2xl font-bold text-gray-700">Schedule</h2>
+            <div className="w-full flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-700">Schedule</h2>
+              <Button variant="outline">
+                <Calendar className="mr-2" size={16} /> Add Schedule
+              </Button>
+            </div>
 
             <div className="w-full h-full mt-5">
               <ListSchedule />
