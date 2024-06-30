@@ -8,6 +8,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export default function Edit() {
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("members");
 
   return (

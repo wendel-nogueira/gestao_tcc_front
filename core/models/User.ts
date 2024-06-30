@@ -8,20 +8,13 @@ export interface User {
 
 export interface Info {
   id?: string;
-<<<<<<< HEAD
   authId: string;
-=======
->>>>>>> jhonatas
   name: string;
   cpf: string;
   birthDate: string;
   sex: string;
-<<<<<<< HEAD
   role?: string;
   isActive?: boolean;
-=======
-  isActive: boolean;
->>>>>>> jhonatas
   student?: Student;
   teacher?: Teacher;
   external?: External;

@@ -9,11 +9,15 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@phosphor-icons/react";
 import Link from "next/link";
 import { Course } from "@/core/models/Course";
+import { CourseServices } from "@/core/services/CourseServices";
 
 export default function Edit() {
+  const [loading, setLoading] = useState(true);
   const [id, setId] = useState<string | undefined>(undefined);
   const [course, setCourse] = useState<Course | undefined>(undefined);
   const [activeTab, setActiveTab] = useState("edict");
+
+  const courseServices = CourseServices();
 
   useEffect(() => {
     const id = window.location.pathname.split("/").pop();
@@ -24,6 +28,24 @@ export default function Edit() {
       window.location.href = "/home";
     }
   }, []);
+
+  useEffect(() => {
+    if (!id) return;
+
+    setLoading(true);
+
+    courseServices
+      .fetchCourse(id)
+      .then((course) => {
+        console.log("Course fetched", course);
+        setCourse(course);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Failed to fetch course", error);
+        setLoading(false);
+      });
+  }, [id]);
 
   return (
     <div className="w-full mt-8">
@@ -42,7 +64,7 @@ export default function Edit() {
           >
             <p className="text-sm font-medium text-gray-700">Edicts</p>
           </div>
-          <div
+          {/* <div
             className={
               "w-full bg-white flex items-center rounded-lg px-6 py-2 hover:bg-slate-100 cursor-pointer transition duration-300" +
               (activeTab === "students" ? " bg-slate-100" : "")
@@ -50,7 +72,7 @@ export default function Edit() {
             onClick={() => setActiveTab("students")}
           >
             <p className="text-sm font-medium text-gray-700">Students</p>
-          </div>
+          </div> */}
           <div
             className={
               "w-full bg-white flex items-center rounded-lg px-6 py-2 hover:bg-slate-100 cursor-pointer transition duration-300" +
@@ -81,10 +103,10 @@ export default function Edit() {
           </div>
 
           <div className={"w-full" + (activeTab === "edit" ? "" : " hidden")}>
-            <FormCourse />
+            <FormCourse course={course} />
           </div>
 
-          <div
+          {/* <div
             className={"w-full" + (activeTab === "students" ? "" : " hidden")}
           >
             <h2 className="text-2xl font-bold text-gray-700">Students</h2>
@@ -92,7 +114,7 @@ export default function Edit() {
             <div className="w-full h-full mt-5">
               <ListStudents />
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
