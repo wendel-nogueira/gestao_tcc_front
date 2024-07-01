@@ -1,7 +1,7 @@
 import { useApi } from "../hooks/useApi";
 import { Info } from "../models/User";
 
-const url = "http://localhost:5041";
+const url = "http://3.227.175.217:8082";
 
 export function UserServices() {
   const api = useApi();

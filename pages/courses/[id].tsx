@@ -10,11 +10,13 @@ import { Calendar } from "@phosphor-icons/react";
 import Link from "next/link";
 import { Course } from "@/core/models/Course";
 import { CourseServices } from "@/core/services/CourseServices";
+import { Edict } from "@/core/models/Edict";
 
 export default function Edit() {
   const [loading, setLoading] = useState(true);
   const [id, setId] = useState<string | undefined>(undefined);
   const [course, setCourse] = useState<Course | undefined>(undefined);
+  const [edicts, setEdicts] = useState<Edict[]>([]);
   const [activeTab, setActiveTab] = useState("edict");
 
   const courseServices = CourseServices();
@@ -39,6 +41,7 @@ export default function Edit() {
       .then((course) => {
         console.log("Course fetched", course);
         setCourse(course);
+        setEdicts(course.edicts || []);
         setLoading(false);
       })
       .catch((error) => {
@@ -98,7 +101,7 @@ export default function Edit() {
             </div>
 
             <div className="w-full h-full mt-5">
-              <ListEdict />
+              <ListEdict edicts={edicts} />
             </div>
           </div>
 

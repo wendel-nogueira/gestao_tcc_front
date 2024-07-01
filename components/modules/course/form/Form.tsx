@@ -82,10 +82,12 @@ export default function FormCourse(props: FormCourseProps) {
   useEffect(() => {
     if (!course) return;
 
-    form.setValue("name", course.name);
-    form.setValue("acronym", course.acronym);
-    form.setValue("coordinator", course.coordinator);
-    form.setValue("tccCoordinator", course.tccCoordinator);
+    form.reset({
+      name: course.name,
+      acronym: course.acronym,
+      coordinator: course.coordinator,
+      tccCoordinator: course.tccCoordinator,
+    });
 
     formSchema.parse({
       name: course.name,

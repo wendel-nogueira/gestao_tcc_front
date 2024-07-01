@@ -103,23 +103,36 @@ export default function Account(props: AccountProps) {
       setUserType((user.role as string).toLowerCase());
       completeFields();
 
-      form.setValue("name", user.name);
-      form.setValue("cpf", user.cpf);
-      form.setValue("birthDate", new Date(user.birthDate));
-      form.setValue("sex", "Male");
-
       if (user.student) {
-        form.setValue("registration", user.student.registration);
-        form.setValue("course", user.student.course);
-        form.setValue("admissionDate", new Date(user.student.admissionDate));
-        form.setValue("graduationDate", new Date(user.student.graduationDate));
+        form.reset({
+          name: user.name,
+          cpf: user.cpf,
+          birthDate: new Date(user.birthDate),
+          sex: user.sex as any,
+          registration: user.student.registration,
+          course: user.student.course,
+          admissionDate: new Date(user.student.admissionDate),
+          graduationDate: new Date(user.student.graduationDate),
+        });
       } else if (user.teacher) {
-        form.setValue("siape", user.teacher.siape);
-        form.setValue("area", user.teacher.area);
+        form.reset({
+          name: user.name,
+          cpf: user.cpf,
+          birthDate: new Date(user.birthDate),
+          sex: user.sex as any,
+          siape: user.teacher.siape,
+          area: user.teacher.area,
+        });
       } else if (user.external) {
-        form.setValue("institution", user.external.institution);
-        form.setValue("formation", user.external.formation);
-        form.setValue("area", user.external.area);
+        form.reset({
+          name: user.name,
+          cpf: user.cpf,
+          birthDate: new Date(user.birthDate),
+          sex: user.sex as any,
+          institution: user.external.institution,
+          formation: user.external.formation,
+          area: user.external.area,
+        });
       }
     }
   }, [user]);
