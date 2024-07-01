@@ -14,9 +14,17 @@ import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-export default function ListEdict() {
+export interface ListEdictProps {
+  edicts: Edict[];
+}
+
+export default function ListEdict(props: ListEdictProps) {
   const [loading, setLoading] = useState(false);
   const [edicts, setEdicts] = useState([] as Edict[]);
+
+  useEffect(() => {
+    setEdicts(props.edicts);
+  }, [props.edicts]);
 
   return <DataTable data={edicts} columns={columns} loading={loading} />;
 }

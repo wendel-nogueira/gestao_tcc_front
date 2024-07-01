@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { AuthServices } from "@/core/services/AuthServices";
 import Account from "@/components/modules/profile/account/Account";
 import { UserServices } from "@/core/services/UserServices";
+import { Info } from "@/core/models/User";
 
 export default function Home() {
   const [toAdd, setToAdd] = useState<
@@ -33,8 +34,8 @@ export default function Home() {
       });
 
       userServices.fetchUserByAuthId(data.nameid).then(
-        (user) => {
-          if (!user) {
+        (user: Info) => {
+          if (!user && data.role !== "Admin") {
             setAdd(true);
           }
 

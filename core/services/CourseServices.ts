@@ -2,7 +2,7 @@ import { useApi } from "../hooks/useApi";
 import { Course } from "../models/Course";
 import { Edict } from "../models/Edict";
 
-const url = "http://localhost:5232";
+const url = "http://3.227.175.217:8083";
 
 export function CourseServices() {
   const api = useApi();

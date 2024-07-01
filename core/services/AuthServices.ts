@@ -1,8 +1,7 @@
 import { useApi } from "../hooks/useApi";
 import { User } from "../models/User";
-import jwt_decode from "jwt-decode";
 
-const url = "http://localhost:5257";
+const url = "http://3.227.175.217:8081";
 
 export function AuthServices() {
   const api = useApi();

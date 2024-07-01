@@ -12,46 +12,30 @@ import { CaretSortIcon, DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { AuthServices } from "@/core/services/AuthServices";
+import { Version } from "@/core/models/Version";
 
-export default function ListVersion() {
-  const authServices = AuthServices();
-
-  const [loading, setLoading] = useState(true);
-  const [users, setUsers] = useState([] as User[]);
-
-  useEffect(() => {
-    const fetchUsers = async () => {
-      const users = await authServices.fetchUsers().catch((error) => {
-        console.error(error);
-        return [];
-      });
-
-      if (!users || users.length === 0) return;
-
-      const allUsers = users.map((user) => {
-        return {
-          id: user.id!,
-          email: user.email!,
-          role: (user.role as any).name!,
-        };
-      });
-
-      setUsers(allUsers);
-      setLoading(false);
-    };
-
-    fetchUsers();
-  }, [authServices]);
-
-  return <DataTable data={users} columns={columns} loading={loading} />;
+export interface ListVersionProps {
+  versions: Version[];
+  loading: boolean;
 }
 
-export type User = {
-  id: string;
-  email: string;
-  role: "Student" | "Teacher" | "External" | "Admin";
-};
+export default function ListVersion(props: ListVersionProps) {
+  const [loading, setLoading] = useState(true);
+  const [versions, setVersions] = useState<Version[]>([]);
+
+  useEffect(() => {
+    if (props.versions) {
+      console.log("props.versions", props.versions);
+      setVersions(props.versions);
+    }
+  }, [props.versions]);
+
+  useEffect(() => {
+    setLoading(props.loading);
+  }, [props.loading]);
+
+  return <DataTable data={versions} columns={columns} loading={loading} />;
+}
 
 export const columns: ColumnDef<any>[] = [
   {
@@ -79,25 +63,42 @@ export const columns: ColumnDef<any>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "number",
+    accessorKey: "name",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Number
+          Name
           <CaretSortIcon className="ml-2 h-4 w-4" />
         </Button>
       );
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
+    cell: ({ row }) => <div className="lowercase">{row.getValue("name")}</div>,
+  },
+  {
+    accessorKey: "description",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Description
+          <CaretSortIcon className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => (
+      <div className="lowercase">{row.getValue("description")}</div>
+    ),
   },
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const user = row.original;
+      const version = row.original;
 
       return (
         <DropdownMenu>
@@ -110,7 +111,7 @@ export const columns: ColumnDef<any>[] = [
           <DropdownMenuContent align="end" className="z-10 bg-white p-2">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem>
-              <Link href={`/works/${user.id}`} target="_blank">
+              <Link href={version.path} target="_blank" passHref>
                 View version
               </Link>
             </DropdownMenuItem>
