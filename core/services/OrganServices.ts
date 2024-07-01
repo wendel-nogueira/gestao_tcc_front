@@ -1,7 +1,7 @@
 import { useApi } from "../hooks/useApi";
 import { Organ } from "../models/Organ";
 
-const url = "http://localhost:5232";
+const url = "http://3.227.175.217:8083";
 
 export function OrganServices() {
   const api = useApi();

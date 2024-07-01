@@ -4,14 +4,14 @@ import { Version } from "./Version";
 export interface Work {
   id?: string;
   title: string;
-  knowledgeArea: string;
+  knowledgeArea: string | number;
   abstract: string;
   keywords: string;
   advisor: string;
   coadvisor: string;
   requestForm: string;
   recordForm: string;
-  status: string;
+  status: string | number;
   student: string;
   edictId: string;
   firstScore: number;

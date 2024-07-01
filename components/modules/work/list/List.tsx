@@ -8,7 +8,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Info } from "@/core/models/User";
 import { Work } from "@/core/models/Work";
+import { UserServices } from "@/core/services/UserServices";
+import { WorkServices } from "@/core/services/WorkServices";
 import { CaretSortIcon, DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
@@ -16,7 +19,55 @@ import { useEffect, useState } from "react";
 
 export default function ListWorks() {
   const [loading, setLoading] = useState(false);
-  const [works, setWorks] = useState([] as Work[]);
+  const [works, setWorks] = useState<Work[]>([]);
+  const [students, setStudents] = useState<Info[]>([]);
+
+  const userServices = UserServices();
+  const workServices = WorkServices();
+
+  useEffect(() => {
+    setLoading(true);
+
+    workServices
+      .fetchWorks()
+      .then((works) => {
+        works.forEach((work) => {
+          const student = students.find(
+            (student) => student.id === work.student
+          );
+          const knowledgeArea = areas.find(
+            (area) => area.value === work.knowledgeArea
+          );
+          const workStatus = status.find(
+            (status) => status.value === work.status
+          );
+
+          work.student = student?.name || "Unknown";
+          work.knowledgeArea = knowledgeArea?.label || "Unknown";
+          work.status = workStatus?.label || "Unknown";
+        });
+
+        setWorks(works);
+      })
+      .catch((error) => {
+        console.error("Failed to fetch works", error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [students]);
+
+  useEffect(() => {
+    userServices
+      .fetchUsers()
+      .then((students) => {
+        console.log("Students fetched", students);
+        setStudents(students);
+      })
+      .catch((error) => {
+        console.error("Failed to fetch students", error);
+      });
+  }, []);
 
   return <DataTable data={works} columns={columns} loading={loading} />;
 }
@@ -59,7 +110,9 @@ export const columns: ColumnDef<any>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("student")}</div>,
+    cell: ({ row }) => (
+      <div className="lowercase">{row.getValue("student")}</div>
+    ),
   },
   {
     accessorKey: "title",
@@ -89,7 +142,9 @@ export const columns: ColumnDef<any>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("knowledgeArea")}</div>,
+    cell: ({ row }) => (
+      <div className="lowercase">{row.getValue("knowledgeArea")}</div>
+    ),
   },
   {
     accessorKey: "status",
@@ -104,7 +159,9 @@ export const columns: ColumnDef<any>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("status")}</div>,
+    cell: ({ row }) => (
+      <div className="lowercase">{row.getValue("status")}</div>
+    ),
   },
   {
     id: "actions",
@@ -130,4 +187,27 @@ export const columns: ColumnDef<any>[] = [
       );
     },
   },
+];
+
+const areas = [
+  { value: 0, label: "Administration" },
+  { value: 1, label: "Human Aspects" },
+  { value: 2, label: "Software Development" },
+  { value: 3, label: "Computation Mathematics" },
+  { value: 4, label: "Computation Methods" },
+  { value: 5, label: "Data Persistence" },
+  { value: 6, label: "Networks" },
+  { value: 7, label: "Computation Theory" },
+];
+
+const status = [
+  { value: 0, label: "Pending" },
+  { value: 1, label: "Approved by advisor" },
+  { value: 2, label: "Reproved by advisor" },
+  { value: 3, label: "Pending coordinator" },
+  { value: 4, label: "Approved by coordinator" },
+  { value: 5, label: "Reproved by coordinator" },
+  { value: 6, label: "In progress" },
+  { value: 7, label: "Concluded approved" },
+  { value: 8, label: "Concluded reproved" },
 ];

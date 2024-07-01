@@ -21,15 +21,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Select,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectGroup,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Popover,
@@ -40,8 +31,17 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { Calendar } from "@/components/ui/calendar";
+import { Edict } from "@/core/models/Edict";
+import { useEffect } from "react";
 
-export default function FormEdict() {
+export interface FormEdictProps {
+  edict?: Edict;
+  onSubmit: (values: any) => void;
+}
+
+export default function FormEdict(props: FormEdictProps) {
+  const { onSubmit } = props;
+
   const formSchema = z.object({
     name: z.string().nonempty("Name is required"),
     description: z.string().optional(),
@@ -57,18 +57,25 @@ export default function FormEdict() {
     resolver: zodResolver(formSchema),
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-  }
+  useEffect(() => {
+    if (!props.edict) return;
+
+    form.reset({
+      name: props.edict.name,
+      description: props.edict.description,
+      startDate: new Date(props.edict.startDate),
+      endDate: new Date(props.edict.endDate),
+    });
+  }, [props.edict]);
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
         <Card>
           <CardHeader>
-            <CardTitle>Register</CardTitle>
+            <CardTitle>{props.edict ? "Edit" : "Register"}</CardTitle>
             <CardDescription>
-              Register a new edict to be used in the system.
+              {props.edict ? "Edit an existing edict" : "Register a new edict"}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -180,7 +187,7 @@ export default function FormEdict() {
             />
           </CardContent>
           <CardFooter>
-            <Button type="submit">Register</Button>
+            <Button type="submit">{props.edict ? "Update" : "Register"}</Button>
           </CardFooter>
         </Card>
       </form>
