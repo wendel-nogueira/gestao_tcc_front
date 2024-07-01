@@ -35,26 +35,19 @@ import {
   SelectGroup,
 } from "@/components/ui/select";
 import { CourseServices } from "@/core/services/CourseServices";
+import { UserServices } from "@/core/services/UserServices";
+import { Info } from "@/core/models/User";
 
-export default function FormCourse() {
+export interface FormCourseProps {
+  course?: Course;
+}
+
+export default function FormCourse(props: FormCourseProps) {
   const courseServices = CourseServices();
-  const [teachers, setTeachers] = useState([]);
-  const url = "https://285d2cd5de532ee05558003c9c675417.loophole.site";
+  const [teachers, setTeachers] = useState<Info[]>([]);
+  const [course, setCourse] = useState<Course | undefined>(props.course);
 
-  useEffect(() => {
-    async function fetchTeachers() {
-      try {
-        const response = await api.get(`${url}/api/users`);
-        const filteredTeachers = response.data.filter((user: any) => user.role === "Teacher");
-        console.log(filteredTeachers);
-        setTeachers(filteredTeachers);
-      } catch (error) {
-        console.error("Failed to fetch teachers", error);
-      }
-    }
-
-    fetchTeachers();
-  }, []);
+  const userService = UserServices();
 
   const formSchema = z.object({
     name: z.string().nonempty("Name is required"),
@@ -67,24 +60,81 @@ export default function FormCourse() {
     resolver: zodResolver(formSchema),
   });
 
+  useEffect(() => {
+    userService
+      .fetchUsers()
+      .then((users) => {
+        const filteredTeachers = users.filter(
+          (user: any) => user.role === "Teacher"
+        );
+
+        setTeachers(filteredTeachers);
+      })
+      .catch((error) => {
+        console.error("Failed to fetch teachers", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (props.course) setCourse(props.course);
+  }, [props.course]);
+
+  useEffect(() => {
+    if (!course) return;
+
+    form.reset({
+      name: course.name,
+      acronym: course.acronym,
+      coordinator: course.coordinator,
+      tccCoordinator: course.tccCoordinator,
+    });
+
+    formSchema.parse({
+      name: course.name,
+      acronym: course.acronym,
+      coordinator: course.coordinator,
+      tccCoordinator: course.tccCoordinator,
+    });
+  }, [course]);
+
   function onSubmit(values: z.infer<typeof formSchema>) {
     const { name, acronym, coordinator, tccCoordinator } = values;
 
-    const course: Course = {
+    let newCourse: Course = {
       name,
       acronym,
       coordinator,
       tccCoordinator,
     };
 
-    courseServices
-      .createCourse(course)
-      .then(() => {
-        alert("Course created successfully, plase verify your email");
-      })
-      .catch((error) => {
-        alert("An error occurred");
-      });
+    if (course) {
+      newCourse = {
+        ...newCourse,
+        id: course.id!,
+      };
+    }
+
+    if (course) {
+      courseServices
+        .updateCourse(newCourse)
+        .then(() => {
+          alert("Course updated successfully");
+        })
+        .catch((error) => {
+          alert("An error occurred");
+        });
+
+      return;
+    } else {
+      courseServices
+        .createCourse(newCourse)
+        .then(() => {
+          alert("Course created successfully, plase verify your email");
+        })
+        .catch((error) => {
+          alert("An error occurred");
+        });
+    }
   }
 
   return (
@@ -92,9 +142,11 @@ export default function FormCourse() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
         <Card>
           <CardHeader>
-            <CardTitle>Register</CardTitle>
+            <CardTitle>{course ? "Edit" : "Register"}</CardTitle>
             <CardDescription>
-              Fill in the form below to register a new course.
+              {course
+                ? "Update the course information"
+                : "Fill in the fields to register a new course"}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -192,7 +244,7 @@ export default function FormCourse() {
             />
           </CardContent>
           <CardFooter>
-            <Button type="submit">Register</Button>
+            <Button type="submit">{course ? "Update" : "Register"}</Button>
           </CardFooter>
         </Card>
       </form>

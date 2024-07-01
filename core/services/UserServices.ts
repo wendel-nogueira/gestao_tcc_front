@@ -1,7 +1,7 @@
 import { useApi } from "../hooks/useApi";
 import { Info } from "../models/User";
 
-const url = "https://285d2cd5de532ee05558003c9c675417.loophole.site";
+const url = "http://3.227.175.217:8082";
 
 export function UserServices() {
   const api = useApi();
@@ -15,6 +15,11 @@ export function UserServices() {
     const response = await api.get<Info>(`${url}/api/users/${id}`);
     return response.data;
   };
+
+  const fetchUserByAuthId = async (authId: string) => {
+    const response = await api.get<Info>(`${url}/api/users/auth/${authId}`);
+    return response.data;
+  }
 
   const createUser = async (user: Info) => {
     const response = await api.post<Info>(`${url}/api/users`, user);
@@ -39,6 +44,7 @@ export function UserServices() {
   return {
     fetchUsers,
     fetchUser,
+    fetchUserByAuthId,
     createUser,
     updateUser,
     activateUser,

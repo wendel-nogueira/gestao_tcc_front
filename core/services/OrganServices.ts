@@ -1,7 +1,7 @@
 import { useApi } from "../hooks/useApi";
 import { Organ } from "../models/Organ";
 
-const url = "https://5cd4e4d3fa8bcbbb21cbbcfb21ced38e.loophole.site";
+const url = "http://3.227.175.217:8083";
 
 export function OrganServices() {
   const api = useApi();

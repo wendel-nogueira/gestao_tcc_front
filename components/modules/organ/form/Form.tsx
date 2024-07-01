@@ -36,30 +36,32 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { OrganServices } from "@/core/services/OrganServices";
+import { CourseServices } from "@/core/services/CourseServices";
+import { Course } from "@/core/models/Course";
 
 export default function FormOrgan() {
   const organServices = OrganServices();
-  const [courses, setCourses] = useState([]);
-  const url = "https://5cd4e4d3fa8bcbbb21cbbcfb21ced38e.loophole.site";
+  const [courses, setCourses] = useState<Course[]>([]);
+
+  const courseServices = CourseServices();
 
   useEffect(() => {
-    async function fetchCourses() {
-      try {
-        const response = await api.get(`${url}/api/course`);
-        setCourses(response.data);
-      } catch (error) {
+    courseServices
+      .fetchCourses()
+      .then((courses) => {
+        console.log(courses);
+        setCourses(courses);
+      })
+      .catch((error) => {
         console.error("Failed to fetch courses", error);
-      }
-    }
-
-    fetchCourses();
+      });
   }, []);
 
   const formSchema = z.object({
     name: z.string().nonempty("Name is required"),
     acronym: z.string().nonempty("Acronym is required"),
     description: z.string().optional(),
-    course: z.any().optional(),
+    course: z.any().optional().nullable(),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -72,8 +74,9 @@ export default function FormOrgan() {
     const organ: Organ = {
       name,
       acronym,
-      description,
-      course,
+      description: description || "",
+      courseId: course,
+      teachers: [],
     };
 
     organServices
@@ -153,8 +156,8 @@ export default function FormOrgan() {
                       <SelectContent>
                         <SelectGroup>
                           <SelectLabel>Course</SelectLabel>
-                          {courses.map((course: any) => (
-                            <SelectItem key={course.id} value={course.id}>
+                          {courses.map((course: Course) => (
+                            <SelectItem key={course.id} value={course.id!}>
                               {course.name}
                             </SelectItem>
                           ))}

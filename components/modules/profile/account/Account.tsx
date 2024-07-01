@@ -22,7 +22,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { AuthServices } from "@/core/services/AuthServices";
-import { User } from "@/core/models/User";
+import { Info as User } from "@/core/models/User";
 import {
   Popover,
   PopoverContent,
@@ -41,30 +41,107 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Separator } from "@radix-ui/react-select";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { UserServices } from "@/core/services/UserServices";
 
-export default function Account() {
-  let userType: string = "external";
+export interface AccountProps {
+  user?: User;
+  toAdd?: {
+    authId: string;
+    role: string;
+  };
+}
 
-  const formSchema = z.object({
-    name: z.string().nonempty("Name is required"),
-    cpf: z.string().nonempty("CPF is required"),
-    birthDate: z.date().refine((date) => {
-      return date < new Date() && date > new Date("1900-01-01");
-    }, "Invalid date"),
-    sex: z.enum(["Male", "Female", "Non-binary", "Other", "Not-to-say"]),
-    registration: z.string().optional(),
-    course: z.string().optional(),
-    admissionDate: z.date().optional(),
-    graduationDate: z.date().optional(),
-    siape: z.string().optional(),
-    area: z.string().optional(),
-    institution: z.string().optional(),
-    formation: z.string().optional(),
-  });
+export default function Account(props: AccountProps) {
+  const [toAdd, setToAdd] = useState<
+    | {
+        authId: string;
+        role: string;
+      }
+    | undefined
+  >(undefined);
+  const [userType, setUserType] = useState<string | undefined>(undefined);
+  const [user, setUser] = useState<User | undefined>(undefined);
+  const userServices = UserServices();
+
+  const formSchema = z
+    .object({
+      name: z.string().nonempty("Name is required"),
+      cpf: z.string().nonempty("CPF is required"),
+      birthDate: z.date().refine((date) => {
+        return date < new Date() && date > new Date("1900-01-01");
+      }, "Invalid date"),
+      sex: z.enum(["Male", "Female", "Non-binary", "Other", "Not-to-say"]),
+      registration: z.string().optional(),
+      course: z.string().optional(),
+      admissionDate: z.date().optional(),
+      graduationDate: z.date().optional(),
+      siape: z.string().optional(),
+      area: z.string().optional(),
+      institution: z.string().optional(),
+      formation: z.string().optional(),
+    })
+    .strict();
 
   useEffect(() => {
+    if (props.user) {
+      console.log(props.user);
+      setUser(props.user);
+    }
+  }, [props.user]);
+
+  useEffect(() => {
+    if (props.toAdd) {
+      setToAdd(props.toAdd);
+      setUserType(props.toAdd.role.toLowerCase());
+      completeFields();
+    }
+  }, [props.toAdd]);
+
+  useEffect(() => {
+    if (user) {
+      setUserType((user.role as string).toLowerCase());
+      completeFields();
+
+      if (user.student) {
+        form.reset({
+          name: user.name,
+          cpf: user.cpf,
+          birthDate: new Date(user.birthDate),
+          sex: user.sex as any,
+          registration: user.student.registration,
+          course: user.student.course,
+          admissionDate: new Date(user.student.admissionDate),
+          graduationDate: new Date(user.student.graduationDate),
+        });
+      } else if (user.teacher) {
+        form.reset({
+          name: user.name,
+          cpf: user.cpf,
+          birthDate: new Date(user.birthDate),
+          sex: user.sex as any,
+          siape: user.teacher.siape,
+          area: user.teacher.area,
+        });
+      } else if (user.external) {
+        form.reset({
+          name: user.name,
+          cpf: user.cpf,
+          birthDate: new Date(user.birthDate),
+          sex: user.sex as any,
+          institution: user.external.institution,
+          formation: user.external.formation,
+          area: user.external.area,
+        });
+      }
+    }
+  }, [user]);
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+  });
+
+  function completeFields() {
     if (userType === "student") {
       formSchema.extend({
         registration: z.string().nonempty("Registration is required"),
@@ -84,16 +161,75 @@ export default function Account() {
         area: z.string().nonempty("Area is required"),
       });
     }
-  }, []);
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-  });
+  }
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    const { name, cpf, birthDate, sex } = values;
+    let userToUpdate = {
+      name: values.name,
+      cpf: values.cpf,
+      birthDate: values.birthDate.toISOString(),
+      sex: values.sex,
+    } as any;
 
-    console.log();
+    if (toAdd) {
+      userToUpdate = {
+        ...userToUpdate,
+        authId: toAdd.authId,
+        role: toAdd.role,
+      };
+    } else {
+      userToUpdate = {
+        ...userToUpdate,
+        id: user?.id,
+      };
+    }
+
+    const student =
+      (userType === "student" && {
+        registration: values.registration,
+        course: values.course,
+        admissionDate: values.admissionDate,
+        graduationDate: values.graduationDate,
+      }) ||
+      null;
+
+    const teacher =
+      (userType === "teacher" && {
+        siape: values.siape,
+        area: values.area,
+      }) ||
+      null;
+
+    const external =
+      (userType === "external" && {
+        institution: values.institution,
+        formation: values.formation,
+        area: values.area,
+      }) ||
+      null;
+
+    userToUpdate = {
+      ...userToUpdate,
+      student,
+      teacher,
+      external,
+    };
+
+    console.log(userToUpdate);
+
+    if (toAdd) {
+      userServices.createUser(userToUpdate).then((response) => {
+        console.log(response);
+
+        window.alert("User updated successfully");
+      });
+    } else {
+      userServices.updateUser(userToUpdate).then((response) => {
+        console.log(response);
+
+        window.alert("User updated successfully");
+      });
+    }
   }
 
   return (
@@ -101,8 +237,20 @@ export default function Account() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
         <Card>
           <CardHeader>
-            <CardTitle>Update Information</CardTitle>
-            <CardDescription>Update your account information</CardDescription>
+            <CardTitle>
+              {toAdd
+                ? "Complete Information"
+                : user
+                ? "Update Information"
+                : "Create Account"}
+            </CardTitle>
+            <CardDescription>
+              {toAdd
+                ? "Complete your information to continue"
+                : user
+                ? "Update your information"
+                : "Create your account"}
+            </CardDescription>
           </CardHeader>
           <CardContent className="w-full grid grid-cols-2 gap-2">
             <FormField

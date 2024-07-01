@@ -1,7 +1,7 @@
 import { useApi } from "../hooks/useApi";
 import { User } from "../models/User";
 
-const url = "https://1c9726bc3e963ba6b95f3f16412c2482.loophole.site";
+const url = "http://3.227.175.217:8081";
 
 export function AuthServices() {
   const api = useApi();
@@ -101,6 +101,19 @@ export function AuthServices() {
     return response.data;
   };
 
+  const getToken = () => {
+    return localStorage.getItem("token");
+  };
+
+  const parseJwt = (token: string) => {
+    if (!token) {
+      return;
+    }
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace("-", "+").replace("_", "/");
+    return JSON.parse(window.atob(base64));
+  };
+
   return {
     fetchUsers,
     fetchUser,
@@ -112,5 +125,7 @@ export function AuthServices() {
     requestPasswordReset,
     resetPassword,
     changeEmail,
+    getToken,
+    parseJwt,
   };
 }

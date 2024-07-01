@@ -15,57 +15,69 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { CourseServices } from "@/core/services/CourseServices";
 import api from "axios";
+import { UserServices } from "@/core/services/UserServices";
+import { Info } from "@/core/models/User";
 
 export default function Courses() {
   const [loading, setLoading] = useState(false);
-  const [courses, setCourses] = useState([] as Course[]);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [teachers, setTeachers] = useState<Info[]>([]);
+
   const courseServices = CourseServices();
-  const [teachers, setTeachers] = useState([]);
-  const url = "https://285d2cd5de532ee05558003c9c675417.loophole.site";
+  const userService = UserServices();
 
   useEffect(() => {
-    async function fetchTeachers() {
-      try {
-        const response = await api.get(`${url}/api/users`);
-        const filteredTeachers = response.data.filter((user: any) => user.role === "Teacher");
-        console.log(filteredTeachers);
-        setTeachers(filteredTeachers);
-      } catch (error) {
-        console.error("Failed to fetch teachers", error);
-      }
-    }
+    setLoading(true);
 
-    fetchTeachers();
+    userService
+      .fetchUsers()
+      .then((users: Info[]) => {
+        const filteredTeachers = users.filter(
+          (user: any) => user.role === "Teacher"
+        );
+
+        setTeachers(filteredTeachers);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Failed to fetch teachers", error);
+        setLoading(false)
+      });
   }, []);
 
   useEffect(() => {
-    const fetchCourses = async () => {
-      const courses = await courseServices.fetchCourses().catch((error) => {
-        console.error(error);
-        return [];
+    if (teachers.length === 0) return;
+
+    setLoading(true);
+
+    courseServices
+      .fetchCourses()
+      .then((courses) => {
+        const allCourses = courses.map((course) => {
+          const coordinator = teachers.find(
+            (teacher: any) => teacher.id === course.coordinator
+          ) as any;
+          const tccCoordinator = teachers.find(
+            (teacher: any) => teacher.id === course.tccCoordinator
+          ) as any;
+
+          return {
+            id: course.id!,
+            name: course.name!,
+            acronym: course.acronym!,
+            coordinator: coordinator ? coordinator.name : "Unknown",
+            tccCoordinator: tccCoordinator ? tccCoordinator.name : "Unknown",
+          };
+        });
+
+        setCourses(allCourses);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Failed to fetch courses", error);
+        setLoading(false);
       });
-
-      if (!courses || courses.length === 0) return;
-
-      const allCourses = courses.map((course) => {
-        const coordinator = teachers.find((teacher: any) => teacher.id === course.coordinator);
-        const tccCoordinator = teachers.find((teacher: any) => teacher.id === course.tccCoordinator);
-
-        return {
-          id: course.id!,
-          name: course.name!,
-          acronym: course.acronym!,
-          coordinator: coordinator ? coordinator.name : "Unknown",
-          tccCoordinator: tccCoordinator ? tccCoordinator.name : "Unknown",
-        };
-      });
-
-      setCourses(allCourses);
-      setLoading(false);
-    };
-
-    fetchCourses();
-  }, [courseServices]);
+  }, [teachers]);
 
   return (
     <div className="p-6 space-y-6 mt-10">
