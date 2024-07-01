@@ -1,11 +1,7 @@
 import { useApi } from "../hooks/useApi";
 import { Info } from "../models/User";
 
-<<<<<<< HEAD
-const url = "https://042d5ba28237544aeee54f79addd0235.loophole.site";
-=======
 const url = "http://3.227.175.217:8082";
->>>>>>> origin/master
 
 export function UserServices() {
   const api = useApi();
