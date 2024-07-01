@@ -1,8 +1,7 @@
 import { useApi } from "../hooks/useApi";
 import { User } from "../models/User";
-import jwt_decode from "jwt-decode";
 
-const url = "http://localhost:5257";
+const url = "https://99228a4725930eb4b8335521dbb6c02c.loophole.site";
 
 export function AuthServices() {
   const api = useApi();
