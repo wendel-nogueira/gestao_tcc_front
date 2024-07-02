@@ -28,6 +28,7 @@ export default function Organs() {
 
   const organServices = OrganServices();
   const courseServices = CourseServices();
+  
   useEffect(() => {
     const verifyUserRole = async () => {
       const token = localStorage.getItem("token");
@@ -43,15 +44,7 @@ export default function Organs() {
     };
 
     verifyUserRole();
-  }, [authServices]);
-
-  if (loading) {
-    return <div>Loading...</div>; // Ou qualquer indicador de carregamento
-  }
-
-  if (currentUserRole !== "Admin") {
-    return <div>Acesso negado. Apenas administradores podem ver esta página.</div>;
-  }
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -105,16 +98,16 @@ export default function Organs() {
     try {
       console.log(`Removing organ with ID: ${organId}`);
       await organServices.removeOrgan(organId);
-      setOrgans(organs.filter(organ => organ.id !== organId));
-      alert('Organ removed successfully');
-    } catch (error) {
-      console.error('Failed to remove organ', error);
+      setOrgans(organs.filter((organ) => organ.id !== organId));
+      alert("Organ removed successfully");
+    } catch (error: any) {
+      console.error("Failed to remove organ", error);
       if (error.response) {
-        console.error('Error response data:', error.response.data);
-        console.error('Error response status:', error.response.status);
-        console.error('Error response headers:', error.response.headers);
+        console.error("Error response data:", error.response.data);
+        console.error("Error response status:", error.response.status);
+        console.error("Error response headers:", error.response.headers);
       }
-      alert('An error occurred while removing the organ');
+      alert("An error occurred while removing the organ");
     } finally {
       setLoading(false);
     }
@@ -158,7 +151,9 @@ export default function Organs() {
           </Button>
         );
       },
-      cell: ({ row }) => <div className="lowercase">{row.getValue("name")}</div>,
+      cell: ({ row }) => (
+        <div className="lowercase">{row.getValue("name")}</div>
+      ),
     },
     {
       accessorKey: "acronym",
