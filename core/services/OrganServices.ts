@@ -26,8 +26,8 @@ export function OrganServices() {
     return response.data;
   };
 
-  const removeOrgan = async (organ: Organ) => {
-    const response = await api.delete<Organ>(`${url}/api/organ/${organ.id}`);
+  const removeOrgan = async (id: string) => {
+    const response = await api.delete<Organ>(`${url}/api/organ/${id}`);
     return response.data;
   };
 

@@ -28,8 +28,8 @@ export function WorkServices() {
     return response.data;
   };
 
-  const removeWork = async (work: Work) => {
-    const response = await api.delete<Work>(`${url}/api/work/${work.id}`);
+  const removeWork = async (id: string) => {
+    const response = await api.delete<Work>(`${url}/api/work/${id}`);
     return response.data;
   };
 
