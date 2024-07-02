@@ -18,6 +18,7 @@ import { useEffect, useState } from "react";
 import { CourseServices } from "@/core/services/CourseServices";
 import { UserServices } from "@/core/services/UserServices";
 import { Info } from "@/core/models/User";
+import { AuthServices } from "@/core/services/AuthServices";
 
 export default function Courses() {
   const [loading, setLoading] = useState(false);
@@ -25,6 +26,33 @@ export default function Courses() {
   const [teachers, setTeachers] = useState<Info[]>([]);
   const courseServices = CourseServices();
   const userService = UserServices();
+  const authServices = AuthServices();
+  const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    const verifyUserRole = async () => {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        window.location.href = "/";
+        return;
+      }
+
+      const data = authServices.parseJwt(token as string);
+      setCurrentUserRole(data.role);
+      setLoading(false);
+    };
+
+    verifyUserRole();
+  }, [authServices]);
+
+  if (loading) {
+    return <div>Loading...</div>; // Ou qualquer indicador de carregamento
+  }
+
+  if (currentUserRole !== "Admin") {
+    return <div>Acesso negado. Apenas administradores podem ver esta página.</div>;
+  }
 
   useEffect(() => {
     setLoading(true);

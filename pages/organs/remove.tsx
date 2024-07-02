@@ -17,14 +17,41 @@ import { OrganServices } from "@/core/services/OrganServices";
 import api from "axios";
 import { CourseServices } from "@/core/services/CourseServices";
 import { Course } from "@/core/models/Course";
+import { AuthServices } from "@/core/services/AuthServices";
 
 export default function Organs() {
   const [loading, setLoading] = useState(false);
   const [organs, setOrgans] = useState<Organ[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
+  const authServices = AuthServices();
+  const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
 
   const organServices = OrganServices();
   const courseServices = CourseServices();
+  useEffect(() => {
+    const verifyUserRole = async () => {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        window.location.href = "/";
+        return;
+      }
+
+      const data = authServices.parseJwt(token as string);
+      setCurrentUserRole(data.role);
+      setLoading(false);
+    };
+
+    verifyUserRole();
+  }, [authServices]);
+
+  if (loading) {
+    return <div>Loading...</div>; // Ou qualquer indicador de carregamento
+  }
+
+  if (currentUserRole !== "Admin") {
+    return <div>Acesso negado. Apenas administradores podem ver esta página.</div>;
+  }
 
   useEffect(() => {
     setLoading(true);
