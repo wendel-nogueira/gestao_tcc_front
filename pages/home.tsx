@@ -33,6 +33,11 @@ export default function Home() {
         role: data.role,
       });
 
+      if (data.role === "Admin") {
+        setLoading(false);
+        return
+      }
+
       userServices.fetchUserByAuthId(data.nameid).then(
         (user: Info) => {
           if (!user && data.role !== "Admin") {

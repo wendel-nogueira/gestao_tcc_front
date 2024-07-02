@@ -3,7 +3,8 @@ import { Board } from "../models/Board";
 import { Version } from "../models/Version";
 import { Work } from "../models/Work";
 
-const url = "http://3.227.175.217:8083";
+const url = "https://works.yelluh.xyz";
+// const url = "http://localhost:5232";
 
 export function WorkServices() {
   const api = useApi();
@@ -54,6 +55,16 @@ export function WorkServices() {
     return response.data;
   };
 
+  const exportWorks = async (email: string) => {
+    const response = await api.post(`${url}/api/work/report?email=${email}`);
+    return response.data;
+  };
+
+  const updateStatus = async (workId: string, status: number) => {
+    const response = await api.put(`${url}/api/work/${workId}/status/${status}`);
+    return response.data;
+  };
+
   return {
     fetchWorks,
     fetchWork,
@@ -63,5 +74,7 @@ export function WorkServices() {
     addVersion,
     addBoard,
     updateBoard,
+    exportWorks,
+    updateStatus,
   };
 }

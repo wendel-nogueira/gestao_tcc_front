@@ -6,10 +6,60 @@ import FormOrgan from "@/components/modules/organ/form/Form";
 import ListMembers from "@/components/modules/members/list/List";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { OrganServices } from "@/core/services/OrganServices";
+import { Organ } from "@/core/models/Organ";
+import DialogMembers from "@/components/modules/members/dialog/Dialog";
 
 export default function Edit() {
+  const [id, setId] = useState<string | undefined>();
+  const [organ, setOrgan] = useState<Organ | undefined>();
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("members");
+
+  const [teachers, setTeachers] = useState<string[]>([]);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const organService = OrganServices();
+
+  useEffect(() => {
+    const path = window.location.pathname.split("/").pop();
+
+    if (!path) return;
+
+    setId(path);
+  }, []);
+
+  useEffect(() => {
+    if (!id) return;
+
+    organService.fetchOrgan(id).then(
+      (organ) => {
+        console.log(organ);
+        setOrgan(organ);
+        console.log(organ.teachers);
+        setTeachers(organ.teachers);
+        setLoading(false);
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
+  }, [id]);
+
+  const handleRemoveTeacher = (memberId: string) => {
+    if (!id) return;
+
+    console.log("remove teacher", memberId);
+
+    organService.removeMember(id, memberId).then(
+      (response) => {
+        setTeachers((prevState) => prevState.filter((id) => id !== memberId));
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
+  };
 
   return (
     <div className="w-full mt-8">
@@ -45,37 +95,32 @@ export default function Edit() {
           >
             <div className="w-full flex items-center justify-between">
               <h2 className="text-2xl font-bold text-gray-700">Members</h2>
-              <Button variant="outline">
+              <Button variant="outline" onClick={() => setModalOpen(true)}>
                 <User className="mr-2" size={16} /> Add Member
               </Button>
             </div>
 
             <div className="w-full h-full mt-5">
-              <ListMembers />
+              <ListMembers
+                teachers={teachers}
+                removeTeacher={handleRemoveTeacher}
+              />
+              {id && (
+                <DialogMembers
+                  organId={id}
+                  members={teachers}
+                  open={modalOpen}
+                  onClose={() => setModalOpen(false)}
+                />
+              )}
             </div>
           </div>
 
           <div className={"w-full" + (activeTab === "edit" ? "" : " hidden")}>
-            <FormOrgan />
+            <FormOrgan organ={organ} />
           </div>
         </div>
       </div>
     </div>
   );
 }
-
-const fields = {
-  name: "Name",
-  cpf: "CPF",
-  birthDate: "Birth Date",
-  sex: "Sex",
-  isActive: "Active",
-  registration: "Registration",
-  course: "Course",
-  admissionDate: "Admission Date",
-  graduationDate: "Graduation Date",
-  siape: "SIAPE",
-  area: "Area",
-  institution: "Institution",
-  formation: "Formation",
-};

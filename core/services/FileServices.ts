@@ -1,6 +1,6 @@
 import { useApi } from "../hooks/useApi";
 
-const url = "http://3.227.175.217:8086";
+const url = "https://files.yelluh.xyz";
 
 export function FileServices() {
   const api = useApi();
