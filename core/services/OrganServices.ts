@@ -1,7 +1,8 @@
 import { useApi } from "../hooks/useApi";
 import { Organ } from "../models/Organ";
 
-const url = "http://3.227.175.217:8083";
+const url = "https://works.yelluh.xyz";
+// const url = "http://localhost:5232";
 
 export function OrganServices() {
   const api = useApi();
@@ -22,7 +23,10 @@ export function OrganServices() {
   };
 
   const updateOrgan = async (organ: Organ) => {
-    const response = await api.put<Organ>(`${url}/api/organ/${organ.id}`, organ);
+    const response = await api.put<Organ>(
+      `${url}/api/organ/${organ.id}`,
+      organ
+    );
     return response.data;
   };
 
@@ -31,7 +35,19 @@ export function OrganServices() {
     return response.data;
   };
 
+  const addMember = async (organId: string, memberId: any) => {
+    const response = await api.post<Organ>(
+      `${url}/api/organ/${organId}/member/${memberId}`
+    );
+    return response.data;
+  };
 
+  const removeMember = async (organId: string, memberId: any) => {
+    const response = await api.delete<Organ>(
+      `${url}/api/organ/${organId}/member/${memberId}`
+    );
+    return response.data;
+  };
 
   return {
     fetchOrgans,
@@ -39,5 +55,7 @@ export function OrganServices() {
     createOrgan,
     updateOrgan,
     removeOrgan,
+    addMember,
+    removeMember,
   };
 }

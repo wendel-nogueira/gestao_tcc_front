@@ -221,6 +221,8 @@ export default function Account(props: AccountProps) {
       userServices.createUser(userToUpdate).then((response) => {
         console.log(response);
 
+        setToAdd(undefined);
+
         window.alert("User updated successfully");
       });
     } else {

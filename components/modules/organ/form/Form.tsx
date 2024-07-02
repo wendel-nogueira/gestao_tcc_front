@@ -39,7 +39,11 @@ import { OrganServices } from "@/core/services/OrganServices";
 import { CourseServices } from "@/core/services/CourseServices";
 import { Course } from "@/core/models/Course";
 
-export default function FormOrgan() {
+export interface OrganFormProps {
+  organ?: Organ;
+}
+
+export default function FormOrgan({ organ }: OrganFormProps) {
   const organServices = OrganServices();
   const [courses, setCourses] = useState<Course[]>([]);
 
@@ -68,10 +72,21 @@ export default function FormOrgan() {
     resolver: zodResolver(formSchema),
   });
 
+  useEffect(() => {
+    if (organ) {
+      form.reset({
+        name: organ.name,
+        acronym: organ.acronym,
+        description: organ.description,
+        course: organ.courseId,
+      });
+    }
+  }, [organ]);
+
   function onSubmit(values: z.infer<typeof formSchema>) {
     const { name, acronym, description, course } = values;
 
-    const organ: Organ = {
+    let newOrgan: Organ = {
       name,
       acronym,
       description: description || "",
@@ -79,14 +94,32 @@ export default function FormOrgan() {
       teachers: [],
     };
 
-    organServices
-      .createOrgan(organ)
-      .then(() => {
-        alert("Organ created successfully, plase verify your email");
-      })
-      .catch((error) => {
-        alert("An error occurred");
-      });
+    if (organ) {
+      newOrgan = {
+        ...newOrgan,
+        id: organ.id,
+      };
+    }
+
+    if (organ) {
+      return organServices
+        .updateOrgan(newOrgan)
+        .then(() => {
+          alert("Organ updated successfully");
+        })
+        .catch((error) => {
+          alert("An error occurred");
+        });
+    } else {
+      return organServices
+        .createOrgan(newOrgan)
+        .then(() => {
+          alert("Organ created successfully, plase verify your email");
+        })
+        .catch((error) => {
+          alert("An error occurred");
+        });
+    }
   }
 
   return (
@@ -94,9 +127,11 @@ export default function FormOrgan() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
         <Card>
           <CardHeader>
-            <CardTitle>Register</CardTitle>
+            <CardTitle>{organ ? "Edit" : "Register"}</CardTitle>
             <CardDescription>
-              Fill in the form below to register a new organ.
+              {organ
+                ? "Fill in the form below to edit an organ."
+                : "Fill in the form below to register a new organ."}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -171,7 +206,7 @@ export default function FormOrgan() {
             />
           </CardContent>
           <CardFooter>
-            <Button type="submit">Register</Button>
+            <Button type="submit">{organ ? "Update" : "Register"}</Button>
           </CardFooter>
         </Card>
       </form>

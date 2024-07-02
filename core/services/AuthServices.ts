@@ -1,7 +1,7 @@
 import { useApi } from "../hooks/useApi";
 import { User } from "../models/User";
 
-const url = "http://3.227.175.217:8081";
+const url = "https://auth.yelluh.xyz";
 
 export function AuthServices() {
   const api = useApi();

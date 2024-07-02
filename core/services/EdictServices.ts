@@ -1,7 +1,7 @@
 import { useApi } from "../hooks/useApi";
 import { Edict } from "../models/Edict";
 
-const url = "http://3.227.175.217:8083";
+const url = "https://works.yelluh.xyz";
 
 export function EdictServices() {
   const api = useApi();

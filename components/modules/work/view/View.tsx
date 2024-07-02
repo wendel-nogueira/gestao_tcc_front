@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardHeader,
@@ -10,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Info } from "@/core/models/User";
 import { Work } from "@/core/models/Work";
 import { UserServices } from "@/core/services/UserServices";
+import { WorkServices } from "@/core/services/WorkServices";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -23,6 +25,7 @@ export default function View(props: ViewProps) {
   const [loading, setLoading] = useState(true);
 
   const userServices = UserServices();
+  const workServices = WorkServices();
 
   useEffect(() => {
     userServices.fetchUsers().then(
@@ -37,6 +40,22 @@ export default function View(props: ViewProps) {
     );
   }, [props.work]);
 
+  const handleChangeStatus = async (status: number) => {
+    if (!props.work || !props.work.id) return;
+
+    workServices.updateStatus(props.work.id, status).then(
+      (work: Work) => {
+        alert("Status changed successfully");
+        window.location.reload();
+        console.log(work);
+      },
+      (error) => {
+        alert("An error occurred while changing the status");
+        console.error(error);
+      }
+    );
+  };
+
   return (
     <div>
       {props.loading ? (
@@ -47,7 +66,42 @@ export default function View(props: ViewProps) {
             <CardHeader>
               <CardTitle>Work Information</CardTitle>
               <CardDescription>
-                View the information of the work
+                <div className="w-full flex justify-between">
+                  <p>View the information of the work</p>
+
+                  {props.work?.status === 0 && (
+                    <div className="flex items-center gap-2">
+                      <Button
+                        color="primary"
+                        onClick={() => handleChangeStatus(1)}
+                      >
+                        Approve
+                      </Button>
+                      <Button
+                        color="primary"
+                        onClick={() => handleChangeStatus(2)}
+                      >
+                        Reject
+                      </Button>
+                    </div>
+                  )}
+                  {props.work?.status === 1 && (
+                    <div className="flex items-center gap-2">
+                      <Button
+                        color="primary"
+                        onClick={() => handleChangeStatus(6)}
+                      >
+                        Approve
+                      </Button>
+                      <Button
+                        color="primary"
+                        onClick={() => handleChangeStatus(5)}
+                      >
+                        Reject
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
