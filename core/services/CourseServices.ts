@@ -30,8 +30,8 @@ export function CourseServices() {
     return response.data;
   };
 
-  const removeCourse = async (course: Course) => {
-    const response = await api.delete<Course>(`${url}/api/course/${course.id}`);
+  const removeCourse = async (id: string) => {
+    const response = await api.delete<Course>(`${url}/api/course/${id}`);
     return response.data;
   };
 

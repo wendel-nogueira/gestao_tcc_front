@@ -95,6 +95,12 @@ const courseMenu: menuItem[] = [
     description:
       "View all courses. You can view all courses and their details.",
   },
+  {
+    title: "Remove Courses",
+    href: "/courses/remove",
+    description:
+      "Remove a existent course. You can remove courses and their details.",
+  },
 ];
 
 const organMenu: menuItem[] = [
@@ -108,6 +114,12 @@ const organMenu: menuItem[] = [
     href: "/organs",
     description: "View all organs. You can view all organs and their details.",
   },
+  {
+    title: "Remove Organs",
+    href: "/organs/remove",
+    description:
+      "Remove a existent organ. You can remove organs and their details.",
+  },
 ];
 
 const workMenu: menuItem[] = [
@@ -115,6 +127,12 @@ const workMenu: menuItem[] = [
     title: "View Works",
     href: "/works",
     description: "View all works. You can view all works and their details.",
+  },
+  {
+    title: "Remove Works",
+    href: "/works/remove",
+    description:
+      "Remove a existent work. You can remove works and their details.",
   },
 ];
 
