@@ -44,15 +44,7 @@ export default function Courses() {
     };
 
     verifyUserRole();
-  }, [authServices]);
-
-  if (loading) {
-    return <div>Loading...</div>; // Ou qualquer indicador de carregamento
-  }
-
-  if (currentUserRole !== "Admin") {
-    return <div>Acesso negado. Apenas administradores podem ver esta página.</div>;
-  }
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -71,6 +63,10 @@ export default function Courses() {
         console.error("Failed to fetch teachers", error);
         setLoading(false);
       });
+
+    return () => {
+      setLoading(false);
+    };
   }, []);
 
   useEffect(() => {
